@@ -29,13 +29,13 @@
   --code-text: #24221e;
   --tk-kw: #7a3e9d;
   --tk-str: #0f6b3a;
-  --tk-comment: #7b766a;
+  --tk-comment: #66615a;
   --tk-ann: #a1471a;
   --tk-num: #1d5ea8;
   --tk-type: #0a6070;
   --tk-macro: #b4237a;
   --tk-mod: #8a5a00;
-  --tk-punct: #9a948a;
+  --tk-punct: #75706a;
   --mark: #fff2c2;
 
   --radius: 8px;

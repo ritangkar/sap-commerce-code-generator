@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { readRaw } from '../shared/storage';
 import { generateFiles } from '../features/occ/generate';
 import { defaultConfig as occDefault } from '../features/occ/model';
 import { serializeImpex } from '../features/impex/serializer';
@@ -16,6 +17,8 @@ const occPreview = (() => {
 const impexPreview = serializeImpex(TEMPLATES[0].config).text.split('\n').slice(2).join('\n');
 
 export function Landing() {
+  const last = readRaw('lastTool');
+  const lastRoute = last.ok && (last.value === ROUTES.occ || last.value === ROUTES.impex) ? last.value : null;
   return (
     <div className="landing">
       <section className="hero" aria-labelledby="hero-title">
@@ -25,6 +28,7 @@ export function Landing() {
           <p className="lead">Two focused generators that run entirely in your browser: scaffold OCC controllers and test them against a local mock, or assemble ImpEx scripts from CSV data with clear diagnostics.</p>
         </div>
         <ul className="hero-facts">
+          {lastRoute && <li><IconArrow /><span><Link to={lastRoute}>Continue with the {lastRoute === ROUTES.occ ? 'OCC Controller Generator' : 'ImpEx Generator'}</Link> – your last session is restored from this browser.</span></li>}
           <li><IconCheck /><span><strong>Deterministic output.</strong> The same configuration always produces the same files.</span></li>
           <li><IconCheck /><span><strong>Nothing leaves your browser.</strong> No backend, no AI, no analytics, no SAP connection.</span></li>
           <li><IconCheck /><span><strong>Honest validation.</strong> Errors, warnings and information – with the limits of offline checks stated.</span></li>
@@ -43,7 +47,7 @@ export function Landing() {
               <li>Mock requests: path vars, params, JSON bodies</li>
             </ul>
           </div>
-          <div className="preview" aria-hidden="true"><CodeView code={occPreview} lang="java" label="Generated controller preview" /></div>
+          <div className="preview"><CodeView decorative code={occPreview} lang="java" label="Generated controller preview" /></div>
           <div className="cta"><Link className="btn btn-primary" to={ROUTES.occ}>Open OCC generator <IconArrow /></Link></div>
         </article>
 
@@ -58,7 +62,7 @@ export function Landing() {
               <li>Quoted fields, Unicode and newlines handled</li>
             </ul>
           </div>
-          <div className="preview" aria-hidden="true"><CodeView code={impexPreview} lang="impex" label="Generated ImpEx preview" /></div>
+          <div className="preview"><CodeView decorative code={impexPreview} lang="impex" label="Generated ImpEx preview" /></div>
           <div className="cta"><Link className="btn btn-primary" to={ROUTES.impex}>Open ImpEx generator <IconArrow /></Link></div>
         </article>
       </section>

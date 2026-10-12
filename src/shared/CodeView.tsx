@@ -10,13 +10,15 @@ interface Props {
   /** 1-based lines to mark (e.g. a diagnostic location). */
   markLines?: number[];
   maxHeight?: string;
+  /** Purely illustrative (e.g. landing previews): not focusable and hidden from assistive tech. */
+  decorative?: boolean;
 }
 
 /** Read-only, syntax-highlighted code with line numbers. Content is rendered as text nodes (never HTML). */
-export function CodeView({ code, lang, label, markLines = [], maxHeight }: Props) {
+export function CodeView({ code, lang, label, markLines = [], maxHeight, decorative }: Props) {
   const lines = useMemo(() => (code.split('\n').length > MAX_HIGHLIGHT_LINES ? null : highlightLines(code, lang)), [code, lang]);
   return (
-    <div className="codeview" style={maxHeight ? { maxHeight } : undefined} role="region" aria-label={label} tabIndex={0}>
+    <div className="codeview" style={maxHeight ? { maxHeight } : undefined} {...(decorative ? { 'aria-hidden': true } : { role: 'region', 'aria-label': label, tabIndex: 0 })}>
       {lines ? (
         <pre>
           <code>

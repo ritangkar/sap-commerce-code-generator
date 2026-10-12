@@ -32,7 +32,7 @@ export function DiagnosticsPanel({ diagnostics, onSelectLine, emptyText = 'No pr
       {sorted.length === 0 ? (
         <p className="muted pad">{emptyText}</p>
       ) : (
-        <ul className="diag-list">
+        <ul className="diag-list" tabIndex={0} aria-label="Validation messages">
           {sorted.map((d, i) => (
             <li key={`${d.code}-${d.path ?? ''}-${i}`} className={`diag sev-${d.severity}`}>
               <span className="diag-icon" title={label[d.severity]}>{icon[d.severity]}<span className="sr-only">{label[d.severity]}: </span></span>

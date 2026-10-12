@@ -1,4 +1,4 @@
-import { fullPath, type DtoField, type OccConfig, type OccEndpoint, type OccParam } from './model';
+import { fullPath, normSegment, type DtoField, type OccConfig, type OccEndpoint, type OccParam } from './model';
 import { HTTP_STATUS_NAMES, ImportSet, MEDIA_TYPE_CONSTANTS, jstr, parseJavaType } from './javaTypes';
 
 export type FileKind = 'controller' | 'dto' | 'facade' | 'facadeImpl' | 'validator';
@@ -171,11 +171,18 @@ function generateController(c: OccConfig): GeneratedFile {
       im.add('org.springframework.security.access.annotation.Secured');
       lines.push(`${I}@Secured({ ${e.roles.map(jstr).join(', ')} })`);
     }
-    const ma = [`value = ${jstr(e.path.trim())}`, `method = RequestMethod.${e.httpMethod}`];
-    im.add('org.springframework.web.bind.annotation.RequestMethod');
+    const ma = [`value = ${jstr(normSegment(e.path))}`];
+    if (c.mappingStyle === 'RequestMapping') ma.push(`method = RequestMethod.${e.httpMethod}`);
     if (e.consumes.trim()) ma.push(`consumes = ${mediaExpr(e.consumes, im)}`);
     if (e.produces.trim()) ma.push(`produces = ${mediaExpr(e.produces, im)}`);
-    lines.push(`${I}@RequestMapping(${ma.join(', ')})`);
+    if (c.mappingStyle === 'Shortcut') {
+      const ann = `${e.httpMethod.charAt(0)}${e.httpMethod.slice(1).toLowerCase()}Mapping`;
+      im.add(`org.springframework.web.bind.annotation.${ann}`);
+      lines.push(`${I}@${ann}(${ma.join(', ')})`);
+    } else {
+      im.add('org.springframework.web.bind.annotation.RequestMethod');
+      lines.push(`${I}@RequestMapping(${ma.join(', ')})`);
+    }
     if (ctrlAnn === 'Controller') {
       im.add('org.springframework.web.bind.annotation.ResponseBody');
       lines.push(`${I}@ResponseBody`);

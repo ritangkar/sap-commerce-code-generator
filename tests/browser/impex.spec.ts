@@ -219,3 +219,27 @@ test('generation makes no external requests and has no execute/import actions', 
   const actions = (await page.getByRole('button').allInnerTexts()).concat(await page.getByRole('link').allInnerTexts()).join(' | ').toLowerCase();
   expect(actions).not.toMatch(/execute|import to sap|deploy|apply to environment|run script/);
 });
+
+test('macro and column reorder/delete, allownull flag via the UI', async ({ page }) => {
+  await page.getByRole('tab', { name: /Macros/ }).click();
+  for (const [i, n] of [[1, 'first'], [2, 'second']] as const) {
+    await page.getByRole('button', { name: 'Add macro' }).click();
+    await page.getByLabel(`Name of macro ${i}`).fill(n);
+    await page.getByLabel(`Value of macro ${i}`).fill(String(i));
+  }
+  await page.getByRole('button', { name: 'Move macro 2 up' }).click();
+  expect((await out(page)).split('\n').slice(0, 2)).toEqual(['$second=2', '$first=1']);
+  await page.getByRole('button', { name: 'Delete macro 1' }).click();
+  expect((await out(page)).split('\n')[0]).toBe('$first=1');
+  await page.getByRole('tab', { name: /Header/ }).click();
+  await page.getByRole('group', { name: 'Column 2' }).getByLabel('allownull').check();
+  await page.getByRole('button', { name: 'Move column 2 left' }).click();
+  expect(await out(page)).toContain('INSERT_UPDATE Product;name[lang=en,allownull=true];code[unique=true]');
+  expect(await out(page)).toContain(';Sample product;P-1000'); // row cells follow the column
+});
+
+test('landing offers to continue with the last-used tool', async ({ page }) => {
+  await page.goto('./#/occ-generator');
+  await page.getByRole('link', { name: 'Home', exact: true }).click();
+  await expect(page.getByRole('link', { name: /Continue with the OCC Controller Generator/ })).toBeVisible();
+});

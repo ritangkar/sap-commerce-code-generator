@@ -19,6 +19,7 @@ export const KNOWN_TYPES: Record<string, string> = {
   Map: 'java.util.Map',
   Collection: 'java.util.Collection',
   UUID: 'java.util.UUID',
+  ResponseEntity: 'org.springframework.http.ResponseEntity',
   ProductWsDTO: 'de.hybris.platform.commercewebservicescommons.dto.product.ProductWsDTO',
   CartWsDTO: 'de.hybris.platform.commercewebservicescommons.dto.order.CartWsDTO',
   OrderWsDTO: 'de.hybris.platform.commercewebservicescommons.dto.order.OrderWsDTO',
@@ -29,7 +30,7 @@ export const KNOWN_TYPES: Record<string, string> = {
 /** Types that need no import. */
 export const JAVA_LANG = new Set(['String', 'Integer', 'Long', 'Boolean', 'Double', 'Float', 'Short', 'Byte', 'Character', 'Object', 'Number', 'void', 'int', 'long', 'boolean', 'double', 'float', 'short', 'byte', 'char']);
 
-export const TYPE_CATALOGUE = ['String', 'Integer', 'Long', 'Boolean', 'Double', 'BigDecimal', 'LocalDate', 'LocalDateTime', 'OffsetDateTime', 'Instant', 'Date', 'List<String>', 'Object', 'ProductWsDTO', 'CartWsDTO', 'OrderWsDTO', 'UserWsDTO', 'AddressWsDTO', 'void'];
+export const TYPE_CATALOGUE = ['String', 'Integer', 'Long', 'Boolean', 'Double', 'BigDecimal', 'LocalDate', 'LocalDateTime', 'OffsetDateTime', 'Instant', 'Date', 'List<String>', 'Object', 'ResponseEntity<String>', 'ProductWsDTO', 'CartWsDTO', 'OrderWsDTO', 'UserWsDTO', 'AddressWsDTO', 'void'];
 
 export const SCALAR_TYPES = new Set(['String', 'Integer', 'Long', 'Boolean', 'Double', 'Float', 'Short', 'Byte', 'Character', 'BigDecimal', 'LocalDate', 'LocalDateTime', 'OffsetDateTime', 'ZonedDateTime', 'Instant', 'Date', 'UUID', 'int', 'long', 'boolean', 'double']);
 

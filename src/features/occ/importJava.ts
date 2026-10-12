@@ -197,6 +197,7 @@ export function importJava(source: string): ImportResult {
 
   let pos = open + 1;
   let n = 0;
+  let shortcut = 0;
   while (pos < close) {
     while (pos < close && /\s/.test(m[pos])) pos++;
     if (pos >= close) break;
@@ -240,6 +241,7 @@ export function importJava(source: string): ImportResult {
     }
     n++;
     const e: OccEndpoint = { ...newEndpoint(n), methodName, returnType: ret || 'void', roles: [], responseCodes: [], successStatus: 200, params: [], produces: '', consumes: '', path: '' };
+    if (mapping.name !== 'RequestMapping') shortcut++;
     const margs = annArgs(mapping.args);
     let hm = MAPPING_ANN[mapping.name];
     if (!hm) {
@@ -331,6 +333,7 @@ export function importJava(source: string): ImportResult {
     note('error', 'import.noendpoints', 'No supported endpoint methods were found. The builder was not changed.');
     return { ok: false, config: null, findings };
   }
+  if (shortcut > 0 && shortcut === cfg.endpoints.length) cfg.mappingStyle = 'Shortcut';
   note('info', 'import.scope', 'Imported controller structure only. DTOs, facades and validators are not imported; method bodies and fields are not preserved.');
   return { ok: true, config: cfg, findings };
 }

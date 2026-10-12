@@ -99,6 +99,9 @@ export default function OccPage() {
                     <label className="field"><span>Controller annotation</span>
                       <select value={config.classAnnotation} onChange={(e) => set({ classAnnotation: e.target.value as OccConfig['classAnnotation'] })}><option value="Controller">@Controller (+ @ResponseBody)</option><option value="RestController">@RestController</option></select>
                     </label>
+                    <label className="field"><span>Mapping annotations</span>
+                      <select value={config.mappingStyle} onChange={(e) => set({ mappingStyle: e.target.value as OccConfig['mappingStyle'] })}><option value="RequestMapping">@RequestMapping(method = …)</option><option value="Shortcut">@GetMapping / @PostMapping / …</option></select>
+                    </label>
                     <label className="field"><span>API group / tag</span><input value={config.apiTag} onChange={(e) => set({ apiTag: e.target.value })} /></label>
                   </div>
                   <label className="field"><span>Extra class annotations (one per line, written as typed – no imports generated)</span>
@@ -184,7 +187,7 @@ export default function OccPage() {
           <div className="workspace workspace-files">
             <section className="pane" aria-label="Generated files">
               <div className="pane-head"><h2>Files</h2><DiagnosticSummary diagnostics={diagnostics} /></div>
-              <ul className="diag-list" style={{ maxHeight: 'none' }}>
+              <ul className="diag-list" style={{ maxHeight: 'none' }} aria-label="Generated files">
                 {entries.map((f, i) => (
                   <li key={f.name} style={{ borderBottom: '1px solid var(--border)' }}>
                     <button type="button" className="btn" style={{ width: '100%', justifyContent: 'flex-start', border: 0, borderRadius: 0, background: i === Math.min(fileSel, entries.length - 1) ? 'var(--accent-weak)' : 'transparent', height: 'auto', padding: '8px 12px', flexDirection: 'column', alignItems: 'flex-start', gap: 0, whiteSpace: 'normal', textAlign: 'left' }} onClick={() => setFileSel(i)} aria-current={i === fileSel}>

@@ -6,6 +6,8 @@ export const HTTP_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'] as const;
 export type HttpMethod = (typeof HTTP_METHODS)[number];
 export type ParamKind = 'path' | 'query' | 'header' | 'body';
 export type ClassAnnotation = 'Controller' | 'RestController';
+/** `RequestMapping` emits @RequestMapping(method = …); `Shortcut` emits @GetMapping/@PostMapping/… */
+export type MappingStyle = 'RequestMapping' | 'Shortcut';
 
 export interface KV {
   key: string;
@@ -81,6 +83,7 @@ export interface OccConfig {
   controllerName: string;
   basePath: string;
   classAnnotation: ClassAnnotation;
+  mappingStyle: MappingStyle;
   apiTag: string;
   /** Raw extra class-level annotations, one per entry, e.g. `@Deprecated`. */
   extraClassAnnotations: string[];
@@ -112,6 +115,7 @@ export const defaultConfig = (): OccConfig => ({
   controllerName: 'ProductNotesController',
   basePath: '/{baseSiteId}/product-notes',
   classAnnotation: 'Controller',
+  mappingStyle: 'RequestMapping',
   apiTag: 'Product Notes',
   extraClassAnnotations: [],
   endpoints: [
@@ -183,7 +187,7 @@ export function parseOccConfig(input: unknown): StorageResult<OccConfig> {
     ok: true,
     value: {
       profile: input.profile as Profile, packageName: s(input.packageName), controllerName: s(input.controllerName), basePath: s(input.basePath),
-      classAnnotation: input.classAnnotation === 'RestController' ? 'RestController' : 'Controller', apiTag: s(input.apiTag),
+      classAnnotation: input.classAnnotation === 'RestController' ? 'RestController' : 'Controller', mappingStyle: input.mappingStyle === 'Shortcut' ? 'Shortcut' : 'RequestMapping', apiTag: s(input.apiTag),
       extraClassAnnotations: arr(input.extraClassAnnotations).filter((x): x is string => typeof x === 'string'),
       endpoints,
       dto: {
@@ -199,8 +203,14 @@ export function parseOccConfig(input: unknown): StorageResult<OccConfig> {
   };
 }
 
-/** Full request path pattern of an endpoint. */
+/** Normalise one path segment group: trim, single leading slash, no duplicate or trailing slashes. Empty stays empty. */
+export function normSegment(p: string): string {
+  const t = p.trim().replace(/\/{2,}/g, '/');
+  if (t === '' || t === '/') return '';
+  return (t.startsWith('/') ? t : `/${t}`).replace(/\/$/, '');
+}
+
+/** Full request path pattern of an endpoint: base + method path joined with exactly one slash. */
 export function fullPath(c: OccConfig, e: OccEndpoint): string {
-  const join = `${c.basePath.trim()}${e.path.trim()}`.replace(/\/{2,}/g, '/');
-  return join.length > 1 ? join.replace(/\/$/, '') : join;
+  return `${normSegment(c.basePath)}${normSegment(e.path)}` || '/';
 }

@@ -106,7 +106,7 @@ export function MockTester({ config, setConfig }: Props) {
               </dl>
             </div>
             {result.issues.length > 0 && (
-              <ul className="diag-list" aria-label="Input and validation messages">
+              <ul className="diag-list" tabIndex={0} aria-label="Input and validation messages">
                 {result.issues.map((i, k) => <li key={k} className={`diag sev-${i.severity === 'error' ? 'error' : 'info'}`}><span>{i.severity === 'error' ? 'Error' : 'Info'}: {i.message}</span></li>)}
               </ul>
             )}

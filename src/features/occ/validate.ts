@@ -11,12 +11,13 @@ const OWN_ANNOTATIONS = new Set(['Controller', 'RestController', 'RequestMapping
 const V1 = new Set(['Api', 'ApiOperation', 'ApiParam', 'ApiModel', 'ApiModelProperty', 'ApiResponses']);
 const V3 = new Set(['Tag', 'Operation', 'Parameter', 'Schema']);
 
-function checkPath(d: Diagnostic[], path: string, label: string, p: string, opts: { allowEmpty: boolean }) {
+function checkPath(d: Diagnostic[], path: string, label: string, p: string, opts: { allowEmpty: boolean; addSlash?: boolean }) {
   if (path === '') {
     if (!opts.allowEmpty) d.push({ severity: 'error', code: 'path.empty', message: `${label} is required.`, path: p });
     return;
   }
-  if (!path.startsWith('/')) d.push({ severity: 'error', code: 'path.slash', message: `${label} "${path}" must start with "/".`, path: p });
+  if (!path.startsWith('/') && opts.addSlash) d.push({ severity: 'warning', code: 'path.slash.added', message: `${label} "${path}" has no leading "/"; one is added when generating.`, path: p });
+  else if (!path.startsWith('/')) d.push({ severity: 'error', code: 'path.slash', message: `${label} "${path}" must start with "/".`, path: p });
   if (/\s/.test(path)) d.push({ severity: 'error', code: 'path.space', message: `${label} "${path}" must not contain whitespace.`, path: p });
   if (/\/\//.test(path)) d.push({ severity: 'warning', code: 'path.doubleslash', message: `${label} "${path}" contains "//".`, path: p });
   if (/[?#]/.test(path)) d.push({ severity: 'error', code: 'path.query', message: `${label} "${path}" must not contain "?" or "#"; declare query parameters separately.`, path: p });
@@ -32,7 +33,7 @@ function validateEndpoint(c: OccConfig, e: OccEndpoint, i: number, d: Diagnostic
   if (!e.methodName) d.push({ severity: 'error', code: 'method.missing', message: `Endpoint ${i + 1}: method name is required.`, path: p });
   else if (!isJavaIdentifier(e.methodName)) d.push({ severity: 'error', code: 'method.invalid', message: `"${e.methodName}" is not a valid Java method name.`, path: p });
   else if (/^[A-Z]/.test(e.methodName)) d.push({ severity: 'warning', code: 'method.case', message: `Method "${e.methodName}" should start with a lowercase letter.`, path: p });
-  checkPath(d, e.path, `Endpoint path of ${label}`, `${p}.path`, { allowEmpty: true });
+  checkPath(d, e.path, `Endpoint path of ${label}`, `${p}.path`, { allowEmpty: true, addSlash: true });
 
   if (!HTTP_METHODS.includes(e.httpMethod)) d.push({ severity: 'error', code: 'http.unsupported', message: `Unsupported HTTP method ${e.httpMethod}.`, path: p });
 
@@ -127,6 +128,7 @@ export function validateOcc(c: OccConfig): Diagnostic[] {
     d.push({ severity: 'info', code: 'profile.2205', message: 'Profile 2205: Swagger v1 annotations (io.swagger.annotations) are generated.', hint: 'Assumes javax.* namespaces. The package of @WebserviceValidationException and swagger setup must be verified in your project.' });
   else
     d.push({ severity: 'info', code: 'profile.2211', message: 'Profile 2211: OpenAPI v3 annotations (io.swagger.v3.oas.annotations) are generated.', hint: 'Requires the swaggerintegration setup of 2211. javax.* vs jakarta.* namespace for your exact patch level is not verified by this tool.' });
+  d.push({ severity: 'info', code: 'scope.controller', message: 'A controller alone is not a working OCC endpoint.', hint: 'Business logic, facade/service wiring, DTO mapping, Spring configuration, security and extension dependencies are project-specific and are not generated.' });
   d.push({ severity: 'info', code: 'scope.static', message: 'Static checks only: they do not prove the code compiles against your SAP Commerce installation.' });
 
   if (!c.packageName.trim()) d.push({ severity: 'error', code: 'pkg.missing', message: 'Package name is required.', path: 'packageName' });

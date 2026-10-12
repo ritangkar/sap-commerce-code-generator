@@ -1,0 +1,10 @@
+# Edge cases
+
+$productCatalog=exampleProductCatalog
+$productCatalogVersion=Online
+$catalogVersion=catalogVersion(catalog(id[default=$productCatalog]),version[default=$productCatalogVersion])[unique=true,default=$productCatalog:$productCatalogVersion]
+
+INSERT_UPDATE Product[batchmode=true];code[unique=true];$catalogVersion;name[lang=en];supercategories(code,catalogVersion(catalog(id),version))[collection-delimiter=|,mode=append];description[lang=de,allownull=true]
+;EX-001;;"Example; ""Product""";cat1:$productCatalog:$productCatalogVersion|cat2;"Zeile 1
+Zeile 2 – Übergröße 東京"
+;EX-002;;;;

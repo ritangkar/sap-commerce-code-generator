@@ -1,0 +1,1 @@
+Minimal annotation/type stubs (NOT real Spring/Swagger/SAP classes) used by tests/unit/javac.test.ts to check that generated Java is syntactically valid and internally type-consistent. Passing proves nothing about compatibility with a real SAP Commerce build.
