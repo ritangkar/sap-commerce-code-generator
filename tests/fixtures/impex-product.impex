@@ -1,0 +1,9 @@
+# Example products
+
+$catalog=electronicsProductCatalog
+$version=Staged
+$catalogVersion=catalogVersion(catalog(id[default=$catalog]),version[default=$version])[unique=true,default=$catalog:$version]
+
+INSERT_UPDATE Product;code[unique=true];$catalogVersion;name[lang=en];unit(code)[default=pieces]
+;P-1000;;Sample product;
+;P-1001;;Another product;pieces
