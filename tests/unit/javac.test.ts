@@ -50,7 +50,7 @@ describe.skipIf(!hasJavac)('generated Java compiles against minimal stubs (javac
     try {
       execFileSync('javac', ['-proc:none', '-Xlint:none', '-d', classes, ...sources], { stdio: 'pipe' });
     } catch (e) {
-      throw new Error(`javac failed:\n${(e as { stderr?: Buffer }).stderr?.toString() ?? String(e)}`);
+      throw new Error(`javac failed:\n${(e as { stderr?: Buffer }).stderr?.toString() ?? String(e)}`, { cause: e });
     }
     expect(true).toBe(true);
   });
